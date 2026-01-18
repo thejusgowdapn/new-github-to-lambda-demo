@@ -1,4 +1,5 @@
 version: 0.2
+
 phases:
   install:
     runtime-versions:
@@ -13,11 +14,10 @@ phases:
       - zip -r9 ../deployment_package.zip .
       - cd ..
       - zip -g deployment_package.zip lambda_function.py
-post_build:
+  post_build:  # <--- MUST BE INDENTED to align with 'build' and 'install'
     commands:
       - echo "Uploading to S3..."
       # UPDATED: Added '-0' to the bucket name
-      # test   1
       - aws s3 cp deployment_package.zip s3://lambda-builds-zip-0/ 
       - echo "Updating Lambda function via S3..."
       # UPDATED: Added '-0' to the bucket name here as well
