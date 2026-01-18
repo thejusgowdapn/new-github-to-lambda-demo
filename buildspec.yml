@@ -6,15 +6,8 @@ phases:
       python: 3.11
     commands:
       - echo "Installing dependencies..."
-      # This command forces pip to download binaries compatible with AWS Lambda (Amazon Linux 2)
-      - pip install \
-          --platform manylinux2014_x86_64 \
-          --target=lib \
-          --implementation cp \
-          --python-version 3.11 \
-          --only-binary=:all: \
-          --upgrade \
-          -r requirements.txt
+      # UPDATED: Command is now on a single line to prevent YAML syntax errors
+      - pip install --platform manylinux2014_x86_64 --target=lib --implementation cp --python-version 3.11 --only-binary=:all: --upgrade -r requirements.txt
   build:
     commands:
       - echo "Zipping deployment package..."
