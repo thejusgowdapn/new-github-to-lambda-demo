@@ -6,7 +6,15 @@ phases:
       python: 3.11
     commands:
       - echo "Installing dependencies..."
-      - pip install -r requirements.txt -t lib
+      # This command forces pip to download binaries compatible with AWS Lambda (Amazon Linux 2)
+      - pip install \
+          --platform manylinux2014_x86_64 \
+          --target=lib \
+          --implementation cp \
+          --python-version 3.11 \
+          --only-binary=:all: \
+          --upgrade \
+          -r requirements.txt
   build:
     commands:
       - echo "Zipping deployment package..."
@@ -14,12 +22,10 @@ phases:
       - zip -r9 ../deployment_package.zip .
       - cd ..
       - zip -g deployment_package.zip lambda_function.py
-  post_build:  # <--- MUST BE INDENTED to align with 'build' and 'install'
+  post_build:
     commands:
       - echo "Uploading to S3..."
-      # UPDATED: Added '-0' to the bucket name
       - aws s3 cp deployment_package.zip s3://lambda-builds-zip-0/ 
       - echo "Updating Lambda function via S3..."
-      # UPDATED: Added '-0' to the bucket name here as well
       - aws lambda update-function-code --function-name github-to-lambda-cicd --s3-bucket lambda-builds-zip-0 --s3-key deployment_package.zip
       - echo "Deployment complete!"
